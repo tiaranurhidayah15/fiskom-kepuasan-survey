@@ -28,9 +28,9 @@ mean_scores = indikator.mean()
 ikm = (mean_scores.mean() / 5) * 100
 
 def kategori_ikm(x):
-    if x >= 81: return "Sangat Baik"
-    elif x >= 66: return "Baik"
-    elif x >= 51: return "Cukup"
+    if x >= 82: return "Sangat Baik"
+    elif x >= 67: return "Baik"
+    elif x >= 52: return "Cukup"
     else: return "Kurang"
 
 col1, col2, col3 = st.columns(3)
@@ -48,11 +48,11 @@ st.header("3️⃣ Analisis GAP (Expectation vs Performance)")
 gap_scores = 5 - mean_scores
 prioritas_gap = gap_scores.idxmax()
 
-fig_gap, ax_gap = plt.subplots(figsize=(6,4))
+fig_gap, ax_gap = plt.subplots(figsize=(5,4))
 ax_gap.bar(gap_scores.index, gap_scores.values, color=plt.cm.Set2(range(len(gap_scores))))
 ax_gap.set_ylabel("Nilai GAP")
 ax_gap.set_title("GAP Kepuasan per Indikator")
-ax_gap.grid(axis="y", linestyle="--", alpha=0.6)
+ax_gap.grid(axis="y", linestyle="--", alpha=0.5)
 
 for i, v in enumerate(gap_scores.values):
     ax_gap.text(i, v + 0.03, f"{v:.2f}", ha="center", fontweight="bold")
@@ -75,7 +75,7 @@ plt.colorbar(im, ax=ax_corr)
 
 ax_corr.set_xticks(range(len(corr.columns)))
 ax_corr.set_yticks(range(len(corr.columns)))
-ax_corr.set_xticklabels(corr.columns, rotation=45, ha="right")
+ax_corr.set_xticklabels(corr.columns, rotation=46, ha="right")
 ax_corr.set_yticklabels(corr.columns)
 
 for i in range(len(corr)):
@@ -96,8 +96,8 @@ st.divider()
 # ==========================================================
 st.header("5️⃣ Analisis Regresi Linear Berganda")
 
-X = sm.add_constant(indikator.iloc[:, 0:4])
-y = indikator.iloc[:, 4]
+X = sm.add_constant(indikator.iloc[:, 0:6])
+y = indikator.iloc[:, 6]
 
 model = sm.OLS(y, X, missing="drop").fit()
 
@@ -123,7 +123,7 @@ st.header("6️⃣ Segmentasi Kepuasan Pegawai")
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(indikator.fillna(indikator.mean()))
 
-kmeans = KMeans(n_clusters=3, random_state=42, n_init=10)
+kmeans = KMeans(n_clusters=3, random_state=43, n_init=10)
 cluster_label = kmeans.fit_predict(X_scaled)
 
 # 🔥 GROUPBY PALING AMAN (HANYA DATA NUMERIK)
@@ -150,11 +150,12 @@ for i, row in cluster_mean.iterrows():
     ax_rad.plot(angles, values, label=row["Segment"], color=colors[i])
     ax_rad.fill(angles, values, alpha=0.25)
 
-ax_rad.set_thetagrids(np.degrees(angles[:-1]), labels)
-ax_rad.set_ylim(0, 5)
+ax_rad.set_thetagrids(np.degrees(angles[:-2]), labels)
+ax_rad.set_ylim(0, 6)
 ax_rad.set_title("Radar Segmentasi Kepuasan")
 ax_rad.legend(loc="upper right")
 
 st.pyplot(fig_rad)
 
 st.success("📌 Segmentasi berhasil – siap untuk rekomendasi kebijakan")
+
